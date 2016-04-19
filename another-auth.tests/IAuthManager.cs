@@ -2,7 +2,7 @@
 {
     internal interface IAuthManager
     {
-        void RegisterUser(string v);
+        void RegisterUser(string primaryEmailAddress);
         bool UserExistsByEmail(string v);
     }
 }

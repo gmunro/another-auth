@@ -19,6 +19,8 @@ namespace another_auth.tests
 
             authManager.RegisterUser(primaryEmail);
 
+            Assert.IsTrue(tAuthDb.SaveCalled, "Save was not called on db");
+
             Assert.IsTrue(authManager.UserExistsByEmail(primaryEmail),"Newly registered user did not exist.");
 
             IAuthManager otherAuthManager = new AuthManager(authDb);

@@ -1,4 +1,7 @@
-﻿namespace another_auth.tests
+﻿using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+
+namespace another_auth.tests
 {
     internal class AuthManager : IAuthManager
     {
@@ -9,14 +12,19 @@
             this.authDb = authDb;
         }
 
-        public void RegisterUser(string v)
+        public void RegisterUser(string primaryEmailAddress)
         {
-            
+            authDb.Add<UserAccount>(new UserAccount
+            {
+                PrimaryEmailAddress = primaryEmailAddress
+            });
+            authDb.Save();
         }
 
         public bool UserExistsByEmail(string v)
         {
-            return false;
+            var accounts = authDb.Query<UserAccount>();
+            return accounts.Any(p => string.Equals(v, p.PrimaryEmailAddress));
         }
 
     }
