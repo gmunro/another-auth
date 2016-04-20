@@ -4,9 +4,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using Scrypt;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    internal class StandardLoginManager : ILoginManager
+    public class StandardLoginManager : ILoginManager
     {
         private readonly RNGCryptoServiceProvider _rngCryptoServiceProvider = new RNGCryptoServiceProvider();
         private readonly ScryptEncoder _encoder = new ScryptEncoder();

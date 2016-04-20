@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    internal class StandardAccountManager : IAccountManager
+    public class StandardAccountManager : IAccountManager
     {
         private ILoginManager _loginManager;
         private IUserManager _userManager;

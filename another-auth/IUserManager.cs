@@ -1,6 +1,6 @@
-﻿namespace another_auth.tests
+﻿namespace another_auth
 {
-    internal interface IUserManager
+    public interface IUserManager
     {
         User CreateUser(string primaryEmailAddress);
         bool UserExistsByEmail(string v);

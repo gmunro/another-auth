@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    class User
+    public class User
     {
         [Key]
         public string Id { get; set; }

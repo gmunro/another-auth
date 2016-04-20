@@ -1,6 +1,6 @@
-﻿namespace another_auth.tests
+﻿namespace another_auth
 {
-    class LoginResult
+    public class LoginResult
     {
         public enum Type
         {
@@ -11,7 +11,7 @@
         public Type ResultType { get; set; }
         public User User { get; set; }
     }
-    internal interface ILoginManager
+    public interface ILoginManager
     {
         void CreateLogin(User user, string loginUserName, string password);
         bool LoginExists(User user);

@@ -2,9 +2,9 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    internal interface IAuthDb
+    public interface IAuthDb
     {
         void Save();
         Task SaveAsync();

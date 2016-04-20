@@ -283,7 +283,7 @@ namespace another_auth.tests
 
             IAccountManager accountManager2 = new StandardAccountManager(userManager2, loginManager2);
 
-            Assert.AreEqual(LoginResult.Type.success, accountManager2.ValidLogin(userName, password),"created user account did not persist");
+            Assert.AreEqual(LoginResult.Type.success, accountManager2.ValidLogin(userName, password).ResultType,"created user account did not persist");
         }
     }
 }

@@ -6,9 +6,9 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    class EmailAddressValidator : IUserNameValidator
+    public class EmailAddressValidator : IUserNameValidator
     {
         public bool IsValid(string primaryEmail)
         {

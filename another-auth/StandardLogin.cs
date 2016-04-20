@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    internal class StandardLogin
+    public class StandardLogin
     {
         [Key]
         public string LoginUsername { get; set; }

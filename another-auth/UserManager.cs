@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
-namespace another_auth.tests
+namespace another_auth
 {
-    internal class UserManager : IUserManager
+    public class UserManager : IUserManager
     {
         private readonly IAuthDb _authDb;
         private readonly EmailAddressValidator _emailAddressValidator;

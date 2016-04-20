@@ -1,6 +1,6 @@
-﻿namespace another_auth.tests
+﻿namespace another_auth
 {
-    internal interface IAccountManager
+    public interface IAccountManager
     {
         void CreateUserWithLogin(string userName, string password);
         LoginResult ValidLogin(string userName, string password);
