@@ -8,7 +8,7 @@ namespace another_auth.tests
     {
         void Save();
         Task SaveAsync();
-        void Add<T>(UserAccount userAccount);
-        IQueryable<UserAccount> Query<T>();
+        void Add<T>(T entity);
+        IQueryable<T> Query<T>();
     }
 }

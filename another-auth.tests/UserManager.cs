@@ -4,7 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace another_auth.tests
 {
-    internal class AuthManager : IAuthManager
+    internal class UserManager : IUserManager
     {
         private IAuthDb authDb;
 
@@ -13,36 +13,26 @@ namespace another_auth.tests
             Standard
         };
 
-        public AuthManager(IAuthDb authDb)
+        public UserManager(IAuthDb authDb)
         {
             this.authDb = authDb;
         }
 
-        public UserAccount CreateUser(string primaryEmailAddress)
+        public User CreateUser(string primaryEmailAddress)
         {
-            var user = new UserAccount
+            var user = new User
             {
                 PrimaryEmailAddress = primaryEmailAddress
             };
-            authDb.Add<UserAccount>(user);
+            authDb.Add<User>(user);
             authDb.Save();
             return user;
         }
 
         public bool UserExistsByEmail(string v)
         {
-            var accounts = authDb.Query<UserAccount>();
+            var accounts = authDb.Query<User>();
             return accounts.Any(p => string.Equals(v, p.PrimaryEmailAddress));
-        }
-
-        public void CreateLogin(object user, object standard, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool LoginExists(UserAccount user, LoginType standard)
-        {
-            throw new NotImplementedException();
         }
     }
 }

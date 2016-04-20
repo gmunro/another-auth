@@ -13,42 +13,38 @@ namespace another_auth.tests
         {
             var tAuthDb = new TestAuthDb();
             IAuthDb authDb = tAuthDb;
+            IUserManager userManager = new UserManager(authDb);
 
             const string primaryEmail = "garethmu @gmail.com";
-
-            IAuthManager authManager = new AuthManager(authDb);
-
-            authManager.CreateUser(primaryEmail);
-
+            userManager.CreateUser(primaryEmail);
             Assert.IsTrue(tAuthDb.SaveCalled, "Save was not called on db");
+            Assert.IsTrue(userManager.UserExistsByEmail(primaryEmail),"Newly registered user did not exist.");
 
-            Assert.IsTrue(authManager.UserExistsByEmail(primaryEmail),"Newly registered user did not exist.");
-
-            IAuthManager otherAuthManager = new AuthManager(authDb);
-
-            Assert.IsTrue(otherAuthManager.UserExistsByEmail(primaryEmail),"New auth manager backed by same db, user did not exist.");
+            IUserManager otherUserManager = new UserManager(authDb);
+            Assert.IsTrue(otherUserManager.UserExistsByEmail(primaryEmail),"New UserManager backed by same db, user did not exist.");
         }
 
         [TestMethod]
-        public void LoginPersists()
+        public void StandardLoginPersists()
         {
             var tAuthDb = new TestAuthDb();
             IAuthDb authDb = tAuthDb;
-
-            IAuthManager authManager = new AuthManager(authDb);
+            IUserManager userManager = new UserManager(authDb);
 
             const string primaryEmail = "garethmu@gmail.com";
-            const string password = "zzz1";
-
-            var user = authManager.CreateUser(primaryEmail);
-
-            authManager.CreateLogin(user, AuthManager.LoginType.Standard, password);
-
+            var user = userManager.CreateUser(primaryEmail);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
-            IAuthManager otherAuthManager = new AuthManager(authDb);
+            
 
-            Assert.IsTrue(otherAuthManager.LoginExists(user, AuthManager.LoginType.Standard));
+            ILoginManager loginManager = new StandardLoginManager(authDb);
+            const string password = "zzz1";
+            loginManager.CreateLogin(user, password);
+            Assert.IsTrue(tAuthDb.SaveCalled);
+            Assert.IsTrue(loginManager.LoginExists(user),"Login exists returned false for newly created login");
+
+            ILoginManager otherLoginManager = new StandardLoginManager(authDb);
+            Assert.IsTrue(otherLoginManager.LoginExists(user), "Login did not persist through new LoginManager");
         }
     }
 }
