@@ -100,10 +100,6 @@ namespace another_auth.tests
             {
                 threw = true;
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
             Assert.IsTrue(threw);
         }
 
