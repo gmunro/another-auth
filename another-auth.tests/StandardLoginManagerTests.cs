@@ -1,52 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 
 namespace another_auth.tests
 {
     [TestClass]
-    public class RegisterAndLoginTests
+    public class StandardLoginManagerTests
     {
         private const string DefaultSitePepper = "RegisterAndLoginTestsPepper";
-        private readonly IUserNameValidator _userNameValidator = new EmailAddressValidator();
-        private User CreateUserAccount(IAuthDb authDb, string primaryEmail)
+        private static readonly IUserNameValidator _userNameValidator = new EmailAddressValidator();
+        private static User CreateUserAccountWithStandardLogin(IAuthDb authDb, string primaryEmail, string password)
         {
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
-            return userManager.CreateUser(primaryEmail);
-        }
-
-        private User CreateUserAccountWithStandardLogin(IAuthDb authDb, string primaryEmail, string password)
-        {
-            var user = CreateUserAccount(authDb, primaryEmail);
+            var user = UserManagerTests.CreateUserAccount(authDb, primaryEmail);
             ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
             loginManager.CreateLogin(user, user.PrimaryEmailAddress, password);
             return user;
         }
-
-        [TestMethod]
-        public void InvalidPrimaryEmailAddressTest()
-        {
-            var tAuthDb = new TestAuthDb();
-            IAuthDb authDb = tAuthDb;
-
-            const string primaryEmail = "garethmu @gmail.com";
-
-            Assert.IsFalse(_userNameValidator.IsValid(primaryEmail),"EmailAddressValidator accepted invalid username");
-
-            var threw = false;
-            try
-            {
-                CreateUserAccount(authDb, primaryEmail);
-            }
-            catch (InvalidDataException)
-            {
-                threw = true;
-            }
-            Assert.IsTrue(threw, "Creating user account did not throw expected error with invalid email address");
-        }
-
         [TestMethod]
         public void InvalidLoginUserNameAddressTest()
         {
@@ -67,37 +40,7 @@ namespace another_auth.tests
             {
                 threw = true;
             }
-            Assert.IsTrue(threw,"LoginManager did not throw error with invalid login name");
-        }
-
-        [TestMethod]
-        public void UserPersists()
-        {
-            var tAuthDb = new TestAuthDb();
-            IAuthDb authDb = tAuthDb;
-
-            const string primaryEmail = "garethmu@gmail.com";
-            CreateUserAccount(authDb, primaryEmail);
-            Assert.IsTrue(tAuthDb.SaveCalled, "Save was not called on db");
-
-            IUserManager otherUserManager = new UserManager(authDb, new EmailAddressValidator());
-            Assert.IsTrue(otherUserManager.UserExistsByEmail(primaryEmail), "New UserManager backed by same db, user did not exist.");
-        }
-
-        [TestMethod]
-        public void LoginNonAuthenticatePersists()
-        {
-            var tAuthDb = new TestAuthDb();
-            IAuthDb authDb = tAuthDb;
-
-            const string primaryEmail = "garethmu@gmail.com";
-            const string password = "zzz1";
-
-            var user = CreateUserAccountWithStandardLogin(authDb, primaryEmail, password);
-            Assert.IsTrue(tAuthDb.SaveCalled);
-
-            ILoginManager otherLoginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            Assert.IsTrue(otherLoginManager.LoginExists(user), "LoginUsername did not persist through new LoginManager");
+            Assert.IsTrue(threw, "LoginManager did not throw error with invalid login name");
         }
 
         [TestMethod]
@@ -119,6 +62,22 @@ namespace another_auth.tests
             Assert.AreEqual(LoginResult.Type.success, res.ResultType, "LoginManager returned failiure.");
             Assert.AreEqual(user, res.User, "User returned from LoginManager was not correct.");
 
+        }
+
+        [TestMethod]
+        public void LoginNonAuthenticatePersists()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string primaryEmail = "garethmu@gmail.com";
+            const string password = "zzz1";
+
+            var user = CreateUserAccountWithStandardLogin(authDb, primaryEmail, password);
+            Assert.IsTrue(tAuthDb.SaveCalled);
+
+            ILoginManager otherLoginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
+            Assert.IsTrue(otherLoginManager.LoginExists(user), "LoginUsername did not persist through new LoginManager");
         }
 
         [TestMethod]
@@ -245,45 +204,6 @@ namespace another_auth.tests
             Assert.AreNotEqual(login1.Hash, login2.Hash, "Two user accounts shared the same hash");
         }
 
-        [TestMethod]
-        public void LoginManagerCreatesUserTest()
-        {
-            var authDb = new TestAuthDb();
 
-            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
-
-            IAccountManager accountManager= new StandardAccountManager(userManager, loginManager);
-
-            string userName = "garethmu@gmail.com";
-            string password = "zzz1";
-
-            accountManager.CreateUserWithLogin(userName, password);
-
-            Assert.AreEqual(LoginResult.Type.success,accountManager.ValidLogin(userName, password).ResultType,"Newly created user account failed to login");
-        }
-
-        [TestMethod]
-        public void LoginManagerCreatesUserPersistsTest()
-        {
-            var authDb = new TestAuthDb();
-
-            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
-
-            IAccountManager accountManager = new StandardAccountManager(userManager, loginManager);
-
-            string userName = "garethmu@gmail.com";
-            string password = "zzz1";
-
-            accountManager.CreateUserWithLogin(userName, password);
-
-            ILoginManager loginManager2 = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager2 = new UserManager(authDb, new EmailAddressValidator());
-
-            IAccountManager accountManager2 = new StandardAccountManager(userManager2, loginManager2);
-
-            Assert.AreEqual(LoginResult.Type.success, accountManager2.ValidLogin(userName, password).ResultType,"created user account did not persist");
-        }
     }
 }
