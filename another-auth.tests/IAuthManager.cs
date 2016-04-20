@@ -2,7 +2,9 @@
 {
     internal interface IAuthManager
     {
-        void RegisterUser(string primaryEmailAddress);
+        UserAccount CreateUser(string primaryEmailAddress);
         bool UserExistsByEmail(string v);
+        void CreateLogin(object user, object standard, string password);
+        bool LoginExists(UserAccount user, AuthManager.LoginType standard);
     }
 }
