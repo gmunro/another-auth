@@ -44,8 +44,7 @@ namespace another_auth.tests
         {
             return _authDb.Query<StandardLogin>().Any(p => p.User == user);
         }
-
-        internal LoginResult AttemptLogin(string loginUsername, string password)
+        public LoginResult AttemptLogin(string loginUsername, string password)
         {
             var login = _authDb.Query<StandardLogin>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
 

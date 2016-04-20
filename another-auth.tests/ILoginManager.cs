@@ -15,5 +15,6 @@
     {
         void CreateLogin(User user, string loginUserName, string password);
         bool LoginExists(User user);
+        LoginResult AttemptLogin(string primaryEmail, string password);
     }
 }
