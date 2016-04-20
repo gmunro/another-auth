@@ -63,7 +63,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="IUserNameValidator.cs" />
     <Compile Include="StandardLogin.cs" />
+    <Compile Include="EmailAddressValidator.cs" />
     <Compile Include="UserManager.cs" />
     <Compile Include="IAuthDb.cs" />
     <Compile Include="IUserManager.cs" />

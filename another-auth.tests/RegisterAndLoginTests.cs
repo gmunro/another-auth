@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,18 +10,64 @@ namespace another_auth.tests
     public class RegisterAndLoginTests
     {
         private const string DefaultSitePepper = "RegisterAndLoginTestsPepper";
+        private readonly IUserNameValidator _userNameValidator = new EmailAddressValidator();
         private User CreateUserAccount(IAuthDb authDb, string primaryEmail)
         {
-            IUserManager userManager = new UserManager(authDb);
+            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
             return userManager.CreateUser(primaryEmail);
         }
 
         private User CreateUserAccountWithStandardLogin(IAuthDb authDb, string primaryEmail, string password)
         {
             var user = CreateUserAccount(authDb, primaryEmail);
-            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
             loginManager.CreateLogin(user, user.PrimaryEmailAddress, password);
             return user;
+        }
+
+        [TestMethod]
+        public void InvalidPrimaryEmailAddressTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string primaryEmail = "garethmu @gmail.com";
+
+            Assert.IsFalse(_userNameValidator.IsValid(primaryEmail),"EmailAddressValidator accepted invalid username");
+
+            var threw = false;
+            try
+            {
+                CreateUserAccount(authDb, primaryEmail);
+            }
+            catch (InvalidDataException ex)
+            {
+                threw = true;
+            }
+            Assert.IsTrue(threw, "Creating user account did not throw expected error with invalid email address");
+        }
+
+        [TestMethod]
+        public void InvalidLoginUserNameAddressTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string primaryEmail = "garethmu @gmail.com";
+
+            var lm = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
+
+            var threw = false;
+            try
+            {
+
+                lm.CreateLogin(null, primaryEmail, "password");
+            }
+            catch (InvalidDataException)
+            {
+                threw = true;
+            }
+            Assert.IsTrue(threw,"LoginManager did not throw error with invalid login name");
         }
 
         [TestMethod]
@@ -29,11 +76,11 @@ namespace another_auth.tests
             var tAuthDb = new TestAuthDb();
             IAuthDb authDb = tAuthDb;
 
-            const string primaryEmail = "garethmu @gmail.com";
+            const string primaryEmail = "garethmu@gmail.com";
             CreateUserAccount(authDb, primaryEmail);
             Assert.IsTrue(tAuthDb.SaveCalled, "Save was not called on db");
 
-            IUserManager otherUserManager = new UserManager(authDb);
+            IUserManager otherUserManager = new UserManager(authDb, new EmailAddressValidator());
             Assert.IsTrue(otherUserManager.UserExistsByEmail(primaryEmail), "New UserManager backed by same db, user did not exist.");
         }
 
@@ -49,7 +96,7 @@ namespace another_auth.tests
             var user = CreateUserAccountWithStandardLogin(authDb, primaryEmail, password);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
-            ILoginManager otherLoginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            ILoginManager otherLoginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
             Assert.IsTrue(otherLoginManager.LoginExists(user), "LoginUsername did not persist through new LoginManager");
         }
 
@@ -66,7 +113,7 @@ namespace another_auth.tests
             Assert.IsNotNull(user);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
-            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
             var res = loginManager.AttemptLogin(primaryEmail, password);
 
             Assert.AreEqual(LoginResult.Type.success, res.ResultType, "LoginManager returned failiure.");
@@ -89,7 +136,7 @@ namespace another_auth.tests
 
             (tAuthDb.Backing[typeof(StandardLogin)][0] as StandardLogin).Salt = string.Empty;
 
-            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
 
             var threw = false;
             try
@@ -118,11 +165,11 @@ namespace another_auth.tests
             var login = tAuthDb.Backing[typeof(StandardLogin)][0] as StandardLogin;
             login.Salt = $"{login.Salt}1";
 
-            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
 
             var res = loginManager.AttemptLogin(primaryEmail, password);
 
-            Assert.AreEqual(LoginResult.Type.failiure, res.ResultType,"LoginManager allowed user to login despite salt having changed");
+            Assert.AreEqual(LoginResult.Type.failiure, res.ResultType, "LoginManager allowed user to login despite salt having changed");
 
         }
 
@@ -139,7 +186,7 @@ namespace another_auth.tests
             Assert.IsNotNull(user);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
-            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper);
+            var loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
             var res = loginManager.AttemptLogin(primaryEmail, $"{password}z");
 
             Assert.AreEqual(LoginResult.Type.failiure, res.ResultType, "LoginManager incorrectly authenticated login.");
@@ -158,7 +205,7 @@ namespace another_auth.tests
             Assert.IsNotNull(user);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
-            var loginManager = new StandardLoginManager(authDb, $"{DefaultSitePepper}1");
+            var loginManager = new StandardLoginManager(authDb, $"{DefaultSitePepper}1", _userNameValidator);
             var res = loginManager.AttemptLogin(primaryEmail, password);
 
             Assert.AreEqual(LoginResult.Type.failiure, res.ResultType, "LoginManager incorrectly authenticated login.");

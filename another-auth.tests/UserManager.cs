@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
@@ -6,32 +7,38 @@ namespace another_auth.tests
 {
     internal class UserManager : IUserManager
     {
-        private IAuthDb authDb;
+        private readonly IAuthDb _authDb;
+        private readonly EmailAddressValidator _emailAddressValidator;
 
         public enum LoginType
         {
             Standard
         };
 
-        public UserManager(IAuthDb authDb)
+        public UserManager(IAuthDb authDb, EmailAddressValidator emailValidator)
         {
-            this.authDb = authDb;
+            _authDb = authDb;
+            _emailAddressValidator = emailValidator;
         }
 
         public User CreateUser(string primaryEmailAddress)
         {
+            if (!_emailAddressValidator.IsValid(primaryEmailAddress))
+            {
+                throw new InvalidDataException("Unable to CreateUser, Email address was not in expected format.");
+            }
             var user = new User
             {
                 PrimaryEmailAddress = primaryEmailAddress
             };
-            authDb.Add<User>(user);
-            authDb.Save();
+            _authDb.Add<User>(user);
+            _authDb.Save();
             return user;
         }
 
         public bool UserExistsByEmail(string v)
         {
-            var accounts = authDb.Query<User>();
+            var accounts = _authDb.Query<User>();
             return accounts.Any(p => string.Equals(v, p.PrimaryEmailAddress));
         }
     }

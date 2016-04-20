@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using Scrypt;
@@ -8,18 +9,24 @@ namespace another_auth.tests
     internal class StandardLoginManager : ILoginManager
     {
         private readonly RNGCryptoServiceProvider _rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+        private readonly ScryptEncoder _encoder = new ScryptEncoder();
         private readonly IAuthDb _authDb;
         private readonly string _sitePepper;
-        private readonly ScryptEncoder _encoder = new ScryptEncoder();
+        private readonly IUserNameValidator _userNameValidator;
 
-        public StandardLoginManager(IAuthDb authDb, string sitePepper)
+        public StandardLoginManager(IAuthDb authDb, string sitePepper, IUserNameValidator userNameValidator)
         {
             _authDb = authDb;
             _sitePepper = sitePepper;
+            _userNameValidator = userNameValidator;
         }
 
         public void CreateLogin(User user, string loginUsername, string password)
         {
+            if (!_userNameValidator.IsValid(loginUsername))
+            {
+                throw new InvalidDataException("LoginUsername was not provided in the expected format");
+            }
             // Generate a random salt for this user
             var salt = GetRandomSalt();
             var login = new StandardLogin
