@@ -18,7 +18,14 @@ namespace another_auth.tests
 
         public void Add<T>(T entity)
         {
-            Backing.Add(typeof (T), new List<object> {entity});
+            if (Backing.ContainsKey(typeof (T)))
+            {
+                Backing[typeof(T)].Add(entity);
+            }
+            else
+            {
+                Backing.Add(typeof(T), new List<object> { entity });
+            }
             // Reset SaveCalled so that tests are always checking that save was called following the 
             // latest change.
             SaveCalled = false;

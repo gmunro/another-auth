@@ -167,5 +167,39 @@ namespace another_auth.tests
 
             Assert.AreEqual(LoginResult.Type.failiure, res.ResultType, "LoginManager incorrectly authenticated login.");
         }
+
+        [TestMethod]
+        public void AssureDistinctSaltTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string password = "zzz1";
+
+            var user1 = CreateUserAccountWithStandardLogin(authDb, "garethmu@gmail.com", password);
+            var user2 = CreateUserAccountWithStandardLogin(authDb, "foo@bar.com", password);
+
+            var login1 = tAuthDb.Backing[typeof(StandardLogin)][0] as StandardLogin;
+            var login2 = tAuthDb.Backing[typeof(StandardLogin)][1] as StandardLogin;
+
+            Assert.AreNotEqual(login1.Salt, login2.Salt, "Two user accounts shared the same salt");
+        }
+
+        [TestMethod]
+        public void AssureDistinctHashTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string password = "zzz1";
+
+            var user1 = CreateUserAccountWithStandardLogin(authDb, "garethmu@gmail.com", password);
+            var user2 = CreateUserAccountWithStandardLogin(authDb, "foo@bar.com", password);
+
+            var login1 = tAuthDb.Backing[typeof(StandardLogin)][0] as StandardLogin;
+            var login2 = tAuthDb.Backing[typeof(StandardLogin)][1] as StandardLogin;
+
+            Assert.AreNotEqual(login1.Hash, login2.Hash, "Two user accounts shared the same hash");
+        }
     }
 }
