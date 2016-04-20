@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using another_auth.Interfaces;
 
 namespace another_auth.tests
 {

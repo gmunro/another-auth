@@ -54,10 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmailAddressValidator.cs" />
-    <Compile Include="IAccountManager.cs" />
-    <Compile Include="IAuthDb.cs" />
-    <Compile Include="ILoginManager.cs" />
-    <Compile Include="IUserManager.cs" />
+    <Compile Include="Interfaces\IAccountManager.cs" />
+    <Compile Include="Interfaces\IAuthDb.cs" />
+    <Compile Include="Interfaces\ILoginManager.cs" />
+    <Compile Include="Interfaces\IUserManager.cs" />
     <Compile Include="IUserNameValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StandardAccountManager.cs" />

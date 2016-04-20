@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using another_auth.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 

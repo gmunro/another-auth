@@ -1,4 +1,4 @@
-﻿namespace another_auth
+﻿namespace another_auth.Interfaces
 {
     public interface IAccountManager
     {

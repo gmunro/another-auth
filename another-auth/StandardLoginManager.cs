@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using another_auth.Interfaces;
 using Scrypt;
 
 namespace another_auth

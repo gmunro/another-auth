@@ -1,4 +1,5 @@
 ﻿using System;
+using another_auth.Interfaces;
 
 namespace another_auth
 {

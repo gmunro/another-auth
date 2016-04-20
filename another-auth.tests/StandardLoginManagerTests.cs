@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using another_auth.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace another_auth.tests
