@@ -64,7 +64,7 @@
     <Compile Include="IAuthDb.cs" />
     <Compile Include="IUserManager.cs" />
     <Compile Include="ILoginManager.cs" />
-    <Compile Include="RegisterTests.cs" />
+    <Compile Include="RegisterAndLoginTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StandardLoginManager.cs" />
     <Compile Include="TestAuthDb.cs" />
