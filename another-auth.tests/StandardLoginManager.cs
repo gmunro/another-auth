@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography;
+using Scrypt;
 
 namespace another_auth.tests
 {
     internal class StandardLoginManager : ILoginManager
     {
-        private IAuthDb authDb;
+        private readonly RNGCryptoServiceProvider _rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+        private readonly IAuthDb _authDb;
+        private readonly string _sitePepper;
+        private readonly ScryptEncoder _encoder = new ScryptEncoder();
 
-        public StandardLoginManager(IAuthDb authDb)
+        public StandardLoginManager(IAuthDb authDb, string sitePepper)
         {
-            this.authDb = authDb;
+            _authDb = authDb;
+            _sitePepper = sitePepper;
         }
 
         public void CreateLogin(User user, string loginUsername, string password)
@@ -23,19 +29,20 @@ namespace another_auth.tests
                 Hash = GetHash(salt,password),
                 User = user
             };
-            authDb.Add<StandardLogin>(login);
-            authDb.Save();
+            _authDb.Add<StandardLogin>(login);
+            _authDb.Save();
         }
 
         public bool LoginExists(User user)
         {
-            return authDb.Query<StandardLogin>().Any(p => p.User == user);
+            return _authDb.Query<StandardLogin>().Any(p => p.User == user);
         }
 
         internal LoginResult AttemptLogin(string loginUsername, string password)
         {
-            var login = authDb.Query<StandardLogin>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
+            var login = _authDb.Query<StandardLogin>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
 
+            // If there was no login found for the loginUsername
             if (login == null)
             {
                 return new LoginResult
@@ -44,19 +51,13 @@ namespace another_auth.tests
                 };
             }
 
-            var providedHash = GetHash(login.Salt, password);
-            if (string.IsNullOrWhiteSpace(providedHash) || string.IsNullOrWhiteSpace(login.Salt))
+            if (string.IsNullOrWhiteSpace(_sitePepper)|| string.IsNullOrWhiteSpace(login.Salt))
             {
-                // In the event that a stored hash is invalid, or the calculated one is invalid
-                // do not allow the user to log in.
-                return new LoginResult
-                {
-                    ResultType = LoginResult.Type.failiure
-                };
-                // Todo log this error case
+                throw new InvalidOperationException("An error occured during secure login");
             }
 
-            if (!string.Equals(login.Hash, providedHash))
+            // If the hashes do not match
+            if (!_encoder.Compare(GetSaltedAndPepperedPassword(login.Salt, password), login.Hash))
             {
                 return new LoginResult
                 {
@@ -66,6 +67,7 @@ namespace another_auth.tests
                 };
             }
 
+            // At this stage there is a valid login attempt
             return new LoginResult
             {
                 ResultType = LoginResult.Type.success,
@@ -75,12 +77,23 @@ namespace another_auth.tests
 
         private string GetRandomSalt()
         {
-            return null;
+            // todo perhaps salt length should be configurable
+            var bytes = new byte[64];
+            _rngCryptoServiceProvider.GetBytes(bytes);
+            return Convert.ToBase64String(bytes);
         }
 
         private string GetHash(string salt, string password)
         {
-            return null;
+            var passwordToHash = GetSaltedAndPepperedPassword(salt, password);
+            string hashsedPassword = _encoder.Encode(passwordToHash);
+
+            return hashsedPassword;
+        }
+
+        private string GetSaltedAndPepperedPassword(string salt, string password)
+        {
+            return $"{salt}{password}{_sitePepper}";
         }
     }
 }

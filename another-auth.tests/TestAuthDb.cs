@@ -9,7 +9,7 @@ namespace another_auth.tests
 {
     internal class TestAuthDb : IAuthDb
     {
-        private readonly Dictionary<Type, List<object>> _backing = new Dictionary<Type, List<object>>();
+        public readonly Dictionary<Type, List<object>> Backing = new Dictionary<Type, List<object>>();
         public TestAuthDb()
         {
         }
@@ -18,7 +18,7 @@ namespace another_auth.tests
 
         public void Add<T>(T entity)
         {
-            _backing.Add(typeof (T), new List<object> {entity});
+            Backing.Add(typeof (T), new List<object> {entity});
             // Reset SaveCalled so that tests are always checking that save was called following the 
             // latest change.
             SaveCalled = false;
@@ -26,7 +26,7 @@ namespace another_auth.tests
 
         public IQueryable<T> Query<T>()
         {
-            return _backing[typeof (T)].Cast<T>().AsQueryable();
+            return Backing[typeof (T)].Cast<T>().AsQueryable();
         }
 
         public void Save()
