@@ -66,6 +66,34 @@ namespace another_auth.tests
         }
 
         [TestMethod]
+        public void MultipleAccountTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string primaryEmail = "garethmu@gmail.com";
+            const string password = "zzz1";
+
+            var user1 = CreateUserAccountWithStandardLogin(authDb, primaryEmail, password);
+            var user2 = CreateUserAccountWithStandardLogin(authDb, $"{primaryEmail}.au", password);
+            Assert.IsNotNull(user1);
+            Assert.IsTrue(tAuthDb.SaveCalled);
+
+            ILoginManager<TestUser> loginManager = new LoginManager<TestUser, TestLogin>(authDb, DefaultSitePepper, _userNameValidator);
+            var res = loginManager.AttemptLogin(primaryEmail, password);
+
+            Assert.AreEqual(LoginResult<TestUser>.Type.success, res.ResultType, "LoginManager returned failiure.");
+            Assert.AreEqual(user1, res.User, "User returned from LoginManager was not correct.");
+
+            res = loginManager.AttemptLogin($"{primaryEmail}.au", password);
+
+            Assert.AreEqual(LoginResult<TestUser>.Type.success, res.ResultType, "LoginManager returned failiure.");
+            Assert.AreEqual(user2, res.User);
+            Assert.AreEqual(user2, res.User, "User returned from LoginManager was not correct.");
+
+        }
+
+        [TestMethod]
         public void LoginNonAuthenticatePersists()
         {
             var tAuthDb = new TestAuthDb();
