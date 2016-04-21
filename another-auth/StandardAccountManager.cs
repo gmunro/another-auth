@@ -14,6 +14,13 @@ namespace another_auth
             _loginManager = loginManager;
         }
 
+        public StandardAccountManager(IAuthDb authDb, string applicationPepper)
+        {
+            var validator = new EmailAddressValidator();
+            _userManager = new UserManager(authDb, validator);
+            _loginManager = new StandardLoginManager(authDb, applicationPepper, validator);
+        }
+
         public void CreateUserWithLogin(string userName, string password)
         {
             var user = _userManager.CreateUser(userName);
