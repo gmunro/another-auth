@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using another_auth.Exceptions;
 using another_auth.Interfaces;
 
 namespace another_auth
@@ -28,6 +29,12 @@ namespace another_auth
             {
                 throw new InvalidDataException("Unable to CreateUser, Email address was not in expected format.");
             }
+
+            if (_authDb.ModelPresent<T>() && _authDb.Query<T>().Any(p => p.PrimaryEmailAddress.Equals(primaryEmailAddress)))
+            {
+                throw new DuplicateAccountException();
+            }
+
             var user = new T
             {
                 PrimaryEmailAddress = primaryEmailAddress

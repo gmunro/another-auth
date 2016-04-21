@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmailAddressValidator.cs" />
+    <Compile Include="Exceptions\DuplicateAccountException.cs" />
     <Compile Include="Interfaces\IAccountManager.cs" />
     <Compile Include="Interfaces\IAuthDb.cs" />
     <Compile Include="Interfaces\ILoginManager.cs" />

@@ -12,7 +12,6 @@ namespace another_auth.sample
         [Key]
         public int Id { get; set; }
 
-        public SampleUser User { get; set; }
-
+        public int UserId { get; set; }
     }
 }

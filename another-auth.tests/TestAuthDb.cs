@@ -32,6 +32,11 @@ namespace another_auth.tests
             SaveCalled = false;
         }
 
+        public bool ModelPresent<T>() where T : class
+        {
+            return Backing.ContainsKey(typeof (T));
+        }
+
         public IQueryable<T> Query<T>() where T : class
         {
             return Backing[typeof (T)].Cast<T>().AsQueryable();

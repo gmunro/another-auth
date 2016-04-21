@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using another_auth.Exceptions;
 using another_auth.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -54,6 +55,28 @@ namespace another_auth.tests
 
             IUserManager<TestUser> otherUserManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
             Assert.IsTrue(otherUserManager.UserExistsByEmail(primaryEmail), "New UserManager backed by same db, user did not exist.");
+        }
+        [TestMethod]
+        public void NoDuplicatePrimaryEmailAddressTest()
+        {
+            var tAuthDb = new TestAuthDb();
+            IAuthDb authDb = tAuthDb;
+
+            const string primaryEmail = "garethmu@gmail.com";
+            CreateUserAccount(authDb, primaryEmail);
+
+            var threw = false;
+            try
+            {
+
+                CreateUserAccount(authDb, primaryEmail);
+            }
+            catch (DuplicateAccountException)
+            {
+                threw = true;
+            }
+
+            Assert.IsTrue(threw);
         }
 
 

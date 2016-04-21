@@ -13,11 +13,11 @@ namespace another_auth.sample
     {
         public DbSet<SampleUser> Users { get; set; }
         public DbSet<SampleLogin> StandardLogins { get; set; }
+
         public AuthDb()
         {
-
+            Configuration.ProxyCreationEnabled = true;
         }
-
 
         public void Add<T>(T entity) where T : class
         {
@@ -39,6 +39,18 @@ namespace another_auth.sample
             await SaveChangesAsync();
         }
 
+        public bool ModelPresent<T>() where T : class
+        {
+            try
+            {
 
+                return Set<T>().Any();
+            }
+            catch (Exception)
+            {
+                // Todo improve
+                return false;
+            }
+        }
     }
 }

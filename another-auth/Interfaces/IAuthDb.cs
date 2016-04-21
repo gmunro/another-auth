@@ -10,5 +10,7 @@ namespace another_auth.Interfaces
         Task SaveAsync();
         void Add<T>(T entity) where T : class; 
         IQueryable<T> Query<T>() where T : class;
+
+        bool ModelPresent<T>() where T : class;
     }
 }
