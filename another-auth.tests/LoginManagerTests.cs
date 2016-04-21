@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace another_auth.tests
 {
     [TestClass]
-    public class StandardLoginManagerTests
+    public class LoginManagerTests
     {
         private const string DefaultSitePepper = "RegisterAndLoginTestsPepper";
         private static readonly IUserNameValidator _userNameValidator = new EmailAddressValidator();
@@ -71,21 +71,22 @@ namespace another_auth.tests
             var tAuthDb = new TestAuthDb();
             IAuthDb authDb = tAuthDb;
 
-            const string primaryEmail = "garethmu@gmail.com";
+            const string user1Email = "garethmu@gmail.com";
+            const string user2Email = "foo@bar.com";
             const string password = "zzz1";
 
-            var user1 = CreateUserAccountWithStandardLogin(authDb, primaryEmail, password);
-            var user2 = CreateUserAccountWithStandardLogin(authDb, $"{primaryEmail}.au", password);
+            var user1 = CreateUserAccountWithStandardLogin(authDb, user1Email, password);
+            var user2 = CreateUserAccountWithStandardLogin(authDb, user2Email, password);
             Assert.IsNotNull(user1);
             Assert.IsTrue(tAuthDb.SaveCalled);
 
             ILoginManager<TestUser> loginManager = new LoginManager<TestUser, TestLogin>(authDb, DefaultSitePepper, _userNameValidator);
-            var res = loginManager.AttemptLogin(primaryEmail, password);
+            var res = loginManager.AttemptLogin(user1Email, password);
 
             Assert.AreEqual(LoginResult<TestUser>.Type.success, res.ResultType, "LoginManager returned failiure.");
             Assert.AreEqual(user1, res.User, "User returned from LoginManager was not correct.");
 
-            res = loginManager.AttemptLogin($"{primaryEmail}.au", password);
+            res = loginManager.AttemptLogin(user2Email, password);
 
             Assert.AreEqual(LoginResult<TestUser>.Type.success, res.ResultType, "LoginManager returned failiure.");
             Assert.AreEqual(user2, res.User);
