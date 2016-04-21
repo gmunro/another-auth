@@ -9,7 +9,7 @@ using another_auth.Interfaces;
 
 namespace another_auth.sample
 {
-    internal class AuthDb : DbContext,IAuthDb
+    internal class AuthDb : DbContext, IAuthDb
     {
         public DbSet<SampleUser> Users { get; set; }
         public DbSet<SampleLogin> StandardLogins { get; set; }
@@ -17,7 +17,7 @@ namespace another_auth.sample
         {
 
         }
-        
+
 
         public void Add<T>(T entity) where T : class
         {
@@ -31,7 +31,7 @@ namespace another_auth.sample
 
         public void Save()
         {
-                SaveChanges();
+            SaveChanges();
         }
 
         public async Task SaveAsync()

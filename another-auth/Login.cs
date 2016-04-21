@@ -2,7 +2,7 @@
 
 namespace another_auth
 {
-    public class StandardLogin<TUser> where TUser : User
+    public abstract class Login<TUser> where TUser : User
     {
         public string LoginUsername { get; set; }
         public string Salt { get; set; }

@@ -7,7 +7,7 @@ using Scrypt;
 
 namespace another_auth
 {
-    public class StandardLoginManager<TUser> : ILoginManager<TUser> where TUser : User
+    public class LoginManager<TUser,TLogin> : ILoginManager<TUser> where TUser : User where TLogin : Login<TUser>, new()
     {
         private readonly RNGCryptoServiceProvider _rngCryptoServiceProvider = new RNGCryptoServiceProvider();
         private readonly ScryptEncoder _encoder = new ScryptEncoder();
@@ -15,7 +15,7 @@ namespace another_auth
         private readonly string _sitePepper;
         private readonly IUserNameValidator _userNameValidator;
 
-        public StandardLoginManager(IAuthDb authDb, string sitePepper, IUserNameValidator userNameValidator)
+        public LoginManager(IAuthDb authDb, string sitePepper, IUserNameValidator userNameValidator)
         {
             _authDb = authDb;
             _sitePepper = sitePepper;
@@ -30,27 +30,27 @@ namespace another_auth
             }
             // Generate a random salt for this user
             var salt = GetRandomSalt();
-            var login = new StandardLogin<TUser>
+            var login = new TLogin
             {
                 LoginUsername = loginUsername,
                 Salt = salt,
                 Hash = GetHash(salt, password),
                 User = user
             };
-            _authDb.Add<StandardLogin<TUser>>(login);
+            _authDb.Add<TLogin>(login);
             _authDb.Save();
         }
 
         public bool LoginExists(TUser user)
         {
-            return _authDb.Query<StandardLogin<TUser>>().Any(p => p.User == user);
+            return _authDb.Query<TLogin>().Any(p => p.User == user);
         }
         public LoginResult<TUser> AttemptLogin(string loginUsername, string password)
         {
-            var login = _authDb.Query<StandardLogin<TUser>>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
+            var login = _authDb.Query<TLogin>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
 
-            // If there was no login found for the loginUsername
-            if (login == null)
+            // If there was no login found for the loginUsername, or the user was not found on it
+            if (login?.User == null)
             {
                 return new LoginResult<TUser>
                 {

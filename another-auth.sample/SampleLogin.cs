@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace another_auth.sample
 {
-    class SampleLogin : StandardLogin<SampleUser>
+    class SampleLogin : Login<SampleUser>
     {
         [Key]
         public int Id { get; set; }

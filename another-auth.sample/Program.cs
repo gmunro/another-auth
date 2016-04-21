@@ -14,7 +14,7 @@ namespace another_auth.sample
             IAuthDb authDb = new AuthDb();
             var pepper = "changme";
 
-            var accountManager = new StandardAccountManager<SampleUser>(authDb, pepper);
+            var accountManager = new StandardAccountManager<SampleUser, SampleLogin>(authDb, pepper);
 
             accountManager.CreateUserWithLogin("foo@bar.com", "password1");
            

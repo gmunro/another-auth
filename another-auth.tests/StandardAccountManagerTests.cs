@@ -18,10 +18,10 @@ namespace another_auth.tests
         {
             var authDb = new TestAuthDb();
 
-            ILoginManager<TestUser> loginManager = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            ILoginManager<TestUser> loginManager = new LoginManager<TestUser,TestLogin>(authDb, DefaultSitePepper, _userNameValidator);
             IUserManager<TestUser> userManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser>(userManager, loginManager);
+            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser, TestLogin>(userManager, loginManager);
 
             string userName = "garethmu@gmail.com";
             string password = "zzz1";
@@ -36,20 +36,20 @@ namespace another_auth.tests
         {
             var authDb = new TestAuthDb();
 
-            ILoginManager<TestUser> loginManager = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            ILoginManager<TestUser> loginManager = new LoginManager<TestUser, TestLogin>(authDb, DefaultSitePepper, _userNameValidator);
             IUserManager<TestUser> userManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser>(userManager, loginManager);
+            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser, TestLogin>(userManager, loginManager);
 
             string userName = "garethmu@gmail.com";
             string password = "zzz1";
 
             accountManager.CreateUserWithLogin(userName, password);
 
-            ILoginManager<TestUser> loginManager2 = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            ILoginManager<TestUser> loginManager2 = new LoginManager<TestUser, TestLogin>(authDb, DefaultSitePepper, _userNameValidator);
             IUserManager<TestUser> userManager2 = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager<TestUser> accountManager2 = new StandardAccountManager<TestUser>(userManager2, loginManager2);
+            IAccountManager<TestUser> accountManager2 = new StandardAccountManager<TestUser, TestLogin>(userManager2, loginManager2);
 
             Assert.AreEqual(LoginResult<TestUser>.Type.success, accountManager2.ValidLogin(userName, password).ResultType, "created user account did not persist");
         }
