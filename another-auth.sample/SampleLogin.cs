@@ -5,10 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace another_auth
+namespace another_auth.sample
 {
-    public abstract class User
+    class SampleLogin : StandardLogin<SampleUser>
     {
-        public string PrimaryEmailAddress { get; set; }
+        [Key]
+        public int Id { get; set; }
+
+        public SampleUser User { get; set; }
+
     }
 }

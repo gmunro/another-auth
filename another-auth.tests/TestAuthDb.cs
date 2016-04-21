@@ -17,7 +17,7 @@ namespace another_auth.tests
 
         public bool SaveCalled { get; internal set; }
 
-        public void Add<T>(T entity)
+        public void Add<T>(T entity) where T : class
         {
             if (Backing.ContainsKey(typeof (T)))
             {
@@ -32,7 +32,7 @@ namespace another_auth.tests
             SaveCalled = false;
         }
 
-        public IQueryable<T> Query<T>()
+        public IQueryable<T> Query<T>() where T : class
         {
             return Backing[typeof (T)].Cast<T>().AsQueryable();
         }

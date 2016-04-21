@@ -22,7 +22,7 @@ namespace another_auth.sample
         }
         
 
-        public void Add<T>(T entity)
+        public void Add<T>(T entity) where T : class
         {
             if (Backing.ContainsKey(typeof (T)))
             {
@@ -36,7 +36,7 @@ namespace another_auth.sample
             // latest change.
         }
 
-        public IQueryable<T> Query<T>()
+        public IQueryable<T> Query<T>() where T : class
         {
             return Backing[typeof (T)].Cast<T>().AsQueryable();
         }

@@ -11,20 +11,20 @@ namespace another_auth.sample
     {
         static void Main(string[] args)
         {
-            IAuthDb authDb = new SampleNonPersistantAuthDb();
+            IAuthDb authDb = new AuthDb();
             var pepper = "changme";
 
-            var accountManager = new StandardAccountManager(authDb, pepper);
+            var accountManager = new StandardAccountManager<SampleUser>(authDb, pepper);
 
             accountManager.CreateUserWithLogin("foo@bar.com", "password1");
            
             var result = accountManager.ValidLogin("foo@bar.com", "password1");
 
-            if (result.ResultType == LoginResult.Type.success)
+            if (result.ResultType == LoginResult<SampleUser>.Type.success)
             {
                 Console.WriteLine($"User {result.User.PrimaryEmailAddress} logged in OK");
             }
-            else if (result.ResultType == LoginResult.Type.failiure)
+            else if (result.ResultType == LoginResult<SampleUser>.Type.failiure)
             {
                 Console.WriteLine($"Unable to login");
             }

@@ -1,8 +1,8 @@
 ﻿namespace another_auth.Interfaces
 {
-    public interface IUserManager
+    public interface IUserManager<T> where T : User, new()
     {
-        User CreateUser(string primaryEmailAddress);
+        T CreateUser(string primaryEmailAddress);
         bool UserExistsByEmail(string v);
     }
 }

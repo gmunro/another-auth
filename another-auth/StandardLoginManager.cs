@@ -7,7 +7,7 @@ using Scrypt;
 
 namespace another_auth
 {
-    public class StandardLoginManager : ILoginManager
+    public class StandardLoginManager<TUser> : ILoginManager<TUser> where TUser : User
     {
         private readonly RNGCryptoServiceProvider _rngCryptoServiceProvider = new RNGCryptoServiceProvider();
         private readonly ScryptEncoder _encoder = new ScryptEncoder();
@@ -22,7 +22,7 @@ namespace another_auth
             _userNameValidator = userNameValidator;
         }
 
-        public void CreateLogin(User user, string loginUsername, string password)
+        public void CreateLogin(TUser user, string loginUsername, string password)
         {
             if (!_userNameValidator.IsValid(loginUsername))
             {
@@ -30,35 +30,35 @@ namespace another_auth
             }
             // Generate a random salt for this user
             var salt = GetRandomSalt();
-            var login = new StandardLogin
+            var login = new StandardLogin<TUser>
             {
                 LoginUsername = loginUsername,
                 Salt = salt,
-                Hash = GetHash(salt,password),
+                Hash = GetHash(salt, password),
                 User = user
             };
-            _authDb.Add<StandardLogin>(login);
+            _authDb.Add<StandardLogin<TUser>>(login);
             _authDb.Save();
         }
 
-        public bool LoginExists(User user)
+        public bool LoginExists(TUser user)
         {
-            return _authDb.Query<StandardLogin>().Any(p => p.User == user);
+            return _authDb.Query<StandardLogin<TUser>>().Any(p => p.User == user);
         }
-        public LoginResult AttemptLogin(string loginUsername, string password)
+        public LoginResult<TUser> AttemptLogin(string loginUsername, string password)
         {
-            var login = _authDb.Query<StandardLogin>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
+            var login = _authDb.Query<StandardLogin<TUser>>().FirstOrDefault(p => string.Equals(p.LoginUsername, loginUsername));
 
             // If there was no login found for the loginUsername
             if (login == null)
             {
-                return new LoginResult
+                return new LoginResult<TUser>
                 {
-                    ResultType = LoginResult.Type.failiure
+                    ResultType = LoginResult<TUser>.Type.failiure
                 };
             }
 
-            if (string.IsNullOrWhiteSpace(_sitePepper)|| string.IsNullOrWhiteSpace(login.Salt))
+            if (string.IsNullOrWhiteSpace(_sitePepper) || string.IsNullOrWhiteSpace(login.Salt))
             {
                 throw new InvalidOperationException("An error occured during secure login");
             }
@@ -66,18 +66,18 @@ namespace another_auth
             // If the hashes do not match
             if (!_encoder.Compare(GetSaltedAndPepperedPassword(login.Salt, password), login.Hash))
             {
-                return new LoginResult
+                return new LoginResult<TUser>
                 {
-                    ResultType = LoginResult.Type.failiure,
+                    ResultType = LoginResult<TUser>.Type.failiure,
                     // User may be desired to implement attempt logging, notifications etc.
                     //User = login.User
                 };
             }
 
             // At this stage there is a valid login attempt
-            return new LoginResult
+            return new LoginResult<TUser>
             {
-                ResultType = LoginResult.Type.success,
+                ResultType = LoginResult<TUser>.Type.success,
                 User = login.User
             };
         }

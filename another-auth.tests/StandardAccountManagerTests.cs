@@ -18,17 +18,17 @@ namespace another_auth.tests
         {
             var authDb = new TestAuthDb();
 
-            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
+            ILoginManager<TestUser> loginManager = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            IUserManager<TestUser> userManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager accountManager = new StandardAccountManager(userManager, loginManager);
+            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser>(userManager, loginManager);
 
             string userName = "garethmu@gmail.com";
             string password = "zzz1";
 
             accountManager.CreateUserWithLogin(userName, password);
 
-            Assert.AreEqual(LoginResult.Type.success, accountManager.ValidLogin(userName, password).ResultType, "Newly created user account failed to login");
+            Assert.AreEqual(LoginResult<TestUser>.Type.success, accountManager.ValidLogin(userName, password).ResultType, "Newly created user account failed to login");
         }
 
         [TestMethod]
@@ -36,22 +36,22 @@ namespace another_auth.tests
         {
             var authDb = new TestAuthDb();
 
-            ILoginManager loginManager = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
+            ILoginManager<TestUser> loginManager = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            IUserManager<TestUser> userManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager accountManager = new StandardAccountManager(userManager, loginManager);
+            IAccountManager<TestUser> accountManager = new StandardAccountManager<TestUser>(userManager, loginManager);
 
             string userName = "garethmu@gmail.com";
             string password = "zzz1";
 
             accountManager.CreateUserWithLogin(userName, password);
 
-            ILoginManager loginManager2 = new StandardLoginManager(authDb, DefaultSitePepper, _userNameValidator);
-            IUserManager userManager2 = new UserManager(authDb, new EmailAddressValidator());
+            ILoginManager<TestUser> loginManager2 = new StandardLoginManager<TestUser>(authDb, DefaultSitePepper, _userNameValidator);
+            IUserManager<TestUser> userManager2 = new UserManager<TestUser>(authDb, new EmailAddressValidator());
 
-            IAccountManager accountManager2 = new StandardAccountManager(userManager2, loginManager2);
+            IAccountManager<TestUser> accountManager2 = new StandardAccountManager<TestUser>(userManager2, loginManager2);
 
-            Assert.AreEqual(LoginResult.Type.success, accountManager2.ValidLogin(userName, password).ResultType, "created user account did not persist");
+            Assert.AreEqual(LoginResult<TestUser>.Type.success, accountManager2.ValidLogin(userName, password).ResultType, "created user account did not persist");
         }
     }
 }

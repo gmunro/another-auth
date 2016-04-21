@@ -6,7 +6,7 @@ using another_auth.Interfaces;
 
 namespace another_auth
 {
-    public class UserManager : IUserManager
+    public class UserManager<T> : IUserManager<T> where T : User, new()
     {
         private readonly IAuthDb _authDb;
         private readonly EmailAddressValidator _emailAddressValidator;
@@ -22,24 +22,24 @@ namespace another_auth
             _emailAddressValidator = emailValidator;
         }
 
-        public User CreateUser(string primaryEmailAddress)
+        public T CreateUser(string primaryEmailAddress)
         {
             if (!_emailAddressValidator.IsValid(primaryEmailAddress))
             {
                 throw new InvalidDataException("Unable to CreateUser, Email address was not in expected format.");
             }
-            var user = new User
+            var user = new T
             {
                 PrimaryEmailAddress = primaryEmailAddress
             };
-            _authDb.Add<User>(user);
+            _authDb.Add<T>(user);
             _authDb.Save();
             return user;
         }
 
         public bool UserExistsByEmail(string v)
         {
-            var accounts = _authDb.Query<User>();
+            var accounts = _authDb.Query<T>();
             return accounts.Any(p => string.Equals(v, p.PrimaryEmailAddress));
         }
     }

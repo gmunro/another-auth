@@ -3,12 +3,12 @@ using another_auth.Interfaces;
 
 namespace another_auth
 {
-    public class StandardAccountManager : IAccountManager
+    public class StandardAccountManager<T> : IAccountManager<T> where T : User, new()
     {
-        private ILoginManager _loginManager;
-        private IUserManager _userManager;
+        private ILoginManager<T> _loginManager;
+        private IUserManager<T> _userManager;
 
-        public StandardAccountManager(IUserManager userManager, ILoginManager loginManager)
+        public StandardAccountManager(IUserManager<T> userManager, ILoginManager<T> loginManager)
         {
             _userManager = userManager;
             _loginManager = loginManager;
@@ -17,8 +17,8 @@ namespace another_auth
         public StandardAccountManager(IAuthDb authDb, string applicationPepper)
         {
             var validator = new EmailAddressValidator();
-            _userManager = new UserManager(authDb, validator);
-            _loginManager = new StandardLoginManager(authDb, applicationPepper, validator);
+            _userManager = new UserManager<T>(authDb, validator);
+            _loginManager = new StandardLoginManager<T>(authDb, applicationPepper, validator);
         }
 
         public void CreateUserWithLogin(string userName, string password)
@@ -27,7 +27,7 @@ namespace another_auth
             _loginManager.CreateLogin(user, userName, password);
         }
 
-        public LoginResult ValidLogin(string userName, string password)
+        public LoginResult<T> ValidLogin(string userName, string password)
         {
             return _loginManager.AttemptLogin(userName, password);
         }

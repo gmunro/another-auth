@@ -10,9 +10,9 @@ namespace another_auth.tests
     [TestClass]
     public class UserManagerTests
     {
-        public static User CreateUserAccount(IAuthDb authDb, string primaryEmail)
+        public static TestUser CreateUserAccount(IAuthDb authDb, string primaryEmail)
         {
-            IUserManager userManager = new UserManager(authDb, new EmailAddressValidator());
+            IUserManager<TestUser> userManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
             return userManager.CreateUser(primaryEmail);
         }
 
@@ -52,7 +52,7 @@ namespace another_auth.tests
             CreateUserAccount(authDb, primaryEmail);
             Assert.IsTrue(tAuthDb.SaveCalled, "Save was not called on db");
 
-            IUserManager otherUserManager = new UserManager(authDb, new EmailAddressValidator());
+            IUserManager<TestUser> otherUserManager = new UserManager<TestUser>(authDb, new EmailAddressValidator());
             Assert.IsTrue(otherUserManager.UserExistsByEmail(primaryEmail), "New UserManager backed by same db, user did not exist.");
         }
 

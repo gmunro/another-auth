@@ -2,13 +2,12 @@
 
 namespace another_auth
 {
-    public class StandardLogin
+    public class StandardLogin<TUser> where TUser : User
     {
-        [Key]
         public string LoginUsername { get; set; }
         public string Salt { get; set; }
         public string Hash { get; set; }
         // User is logged in by login
-        public User User { get; set; }
+        public TUser User { get; set; }
     }
 }
